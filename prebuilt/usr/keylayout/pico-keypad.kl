@@ -1,0 +1,13 @@
+key 102   HOME              WAKE_DROPPED 
+key 139   MENU              WAKE_DROPPED
+key 158   BACK              WAKE_DROPPED
+key 217   SEARCH            WAKE_DROPPED
+key 107   ENDCALL           WAKE_DROPPED
+key 116   POWER             WAKE_DROPPED
+
+# temporality setup
+key 232   DPAD_CENTER       WAKE_DROPPED
+
+key 115   VOLUME_UP         WAKE
+key 114   VOLUME_DOWN       WAKE
+
