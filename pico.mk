@@ -78,6 +78,7 @@ PRODUCT_COPY_FILES += \
 
 # Init
 PRODUCT_COPY_FILES += \
+    device/htc/pico/fstab.pico:root/fstab.pico \
     device/htc/pico/files/init.pico.rc:root/init.pico.rc \
     device/htc/pico/files/ueventd.pico.rc:root/ueventd.pico.rc \
     device/htc/pico/files/init.pico.usb.rc:root/init.pico.usb.rc
@@ -136,10 +137,6 @@ PRODUCT_COPY_FILES += \
     system/bluetooth/data/main.le.conf:system/etc/bluetooth/main.conf \
     device/htc/pico/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
 
-# Vold 
-PRODUCT_COPY_FILES += \
-    device/htc/pico/files/etc/vold.fstab:system/etc/vold.fstab
-    
 # Wifi
 PRODUCT_COPY_FILES += \
     device/htc/pico/prebuilt/etc/firmware/fw_bcm4330_b2.bin:system/etc/firmware/fw_bcm4330_b2.bin \

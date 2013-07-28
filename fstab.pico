@@ -9,3 +9,5 @@
 /system     yaffs2      system
 /sd-ext     ext3        /dev/block/mmcblk0p2
 /devlog     mtd         devlog
+
+/devices/platform/msm_sdcc.1/mmc_host/mmc0 /storage/sdcard0 auto defaults voldmanaged=sdcard:auto
