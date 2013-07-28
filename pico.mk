@@ -78,7 +78,7 @@ PRODUCT_COPY_FILES += \
 
 # Init
 PRODUCT_COPY_FILES += \
-    device/htc/pico/fstab.pico:root/fstab.msm7x27a \
+    device/htc/pico/fstab.msm7x27a:root/fstab.msm7x27a \
     device/htc/pico/files/init.pico.rc:root/init.pico.rc \
     device/htc/pico/files/ueventd.pico.rc:root/ueventd.pico.rc \
     device/htc/pico/files/init.pico.usb.rc:root/init.pico.usb.rc
