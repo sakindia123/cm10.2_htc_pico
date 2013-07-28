@@ -118,7 +118,7 @@ debug.hwc.dynThreshold=1.9
 # Dalvik
 dalvik.vm.heapsize=48m
 ro.zram.default=0
-sys.mem.max_hidden_apps=5
+ro.sys.fw.bg_apps_limit=7
 dalvik.vm.checkjni=0
 dalvik.vm.dexopt-data-only=1
 dalvik.vm.dexopt-flags=v=a,o=v,m=y,u=y
