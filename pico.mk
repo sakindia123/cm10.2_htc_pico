@@ -156,6 +156,8 @@ PRODUCT_COPY_FILES += \
     device/htc/pico/prebuilt/etc/AudioFilter_HP.csv:system/etc/AudioFilter_HP.csv \
     vendor/htc/pico/proprietary/lib/libaudioeq.so:system/lib/libaudioeq.so \
     vendor/htc/pico/proprietary/lib/libhtc_acoustic.so:system/lib/libhtc_acoustic.so \
+    device/htc/pico/prebuilt/lib/libaudioalsa.so:obj/lib/libaudioalsa.so \
+    device/htc/pico/prebuilt/lib/libaudioalsa.so:system/lib/libaudioalsa.so \
 
 # Sensors
 PRODUCT_COPY_FILES += \
