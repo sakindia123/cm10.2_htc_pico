@@ -79,7 +79,7 @@ on boot
 
 on fs
     # mount partitions
-    mount_all /fstab.msm7x27a
+    mount_all /fstab.pico
 
     # Enable low memory killer to check file pages
     write /sys/module/lowmemorykiller/parameters/minfile 0,0,0,5120,5632,6144

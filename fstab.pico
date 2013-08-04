@@ -7,5 +7,5 @@
 /dev/block/mtdblock4     /cache       yaffs2    nosuid,nodev,barrier=1                             wait,check
 /dev/block/mtdblock5     /data        yaffs2     nosuid,nodev,noauto_da_alloc,barrier=1             wait,check
 
-/devices/platform/msm_sdcc.1/mmc_host/mmc0 /storage/sdcard0 auto defaults voldmanaged=sdcard:auto
+/devices/platform/msm_sdcc.1/mmc_host/mmc0 /storage/sdcard0 vfat defaults voldmanaged=sdcard:auto
 
