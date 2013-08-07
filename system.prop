@@ -94,6 +94,7 @@ htc.audio.swalt.enable = 1
 # Display
 debug.composition.7x25A.type=mdp
 ro.hw_plat=7x27a
+ro.bq.gpu_to_cpu_unsupported=1
 media.stagefright.enable-player=true
 media.stagefright.enable-scan=true
 media.stagefright.enable-http=true
