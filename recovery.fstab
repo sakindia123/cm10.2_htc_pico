@@ -11,3 +11,4 @@ system			/system         yaffs2          ro,barrier=1                           
 devlog                  /devlog         mtd             defaults                                 defaults
 /dev/block/mmcblk0p1    /sdcard         vfat            defaults                                 voldmanaged=sdcard:auto,check
 /dev/block/mmcblk0p2    /sd-ext         ext3            defaults                                 voldmanaged=sdcard:auto,check
+

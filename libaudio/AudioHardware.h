@@ -1,6 +1,6 @@
 /*
 ** Copyright 2008, The Android Open-Source Project
-** Copyright (c) 2011-2012, Code Aurora Forum. All rights reserved.
+** Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -163,9 +163,9 @@ enum tty_modes {
 #define AUDIO_HW_OUT_LATENCY_MS 0  // Additionnal latency introduced by audio DSP and hardware in ms
 
 #define AUDIO_HW_IN_SAMPLERATE 8000                 // Default audio input sample rate
-#define AUDIO_HW_IN_CHANNELS (AudioSystem::CHANNEL_IN_MONO) // Default audio input channel mask
+#define AUDIO_HW_IN_CHANNELS (AUDIO_CHANNEL_IN_MONO) // Default audio input channel mask
 #define AUDIO_HW_IN_BUFFERSIZE 2048                 // Default audio input buffer size
-#define AUDIO_HW_IN_FORMAT (AudioSystem::PCM_16_BIT)  // Default audio input sample format
+#define AUDIO_HW_IN_FORMAT (AUDIO_FORMAT_PCM_16_BIT)  // Default audio input sample format
 #ifdef QCOM_VOIP_ENABLED
 #define AUDIO_HW_VOIP_BUFFERSIZE_8K 320
 #define AUDIO_HW_VOIP_BUFFERSIZE_16K 640
@@ -291,10 +291,9 @@ private:
                 return 4800;
             }
         }
-        virtual uint32_t    channels() const { return AudioSystem::CHANNEL_OUT_STEREO; }
-        virtual int         format() const { return AudioSystem::PCM_16_BIT; }
-        virtual uint32_t    latency() const { return 
-(1000*AUDIO_HW_NUM_OUT_BUF*(bufferSize()/frameSize()))/sampleRate()+AUDIO_HW_OUT_LATENCY_MS; }
+        virtual uint32_t    channels() const { return AUDIO_CHANNEL_OUT_STEREO; }
+        virtual int         format() const { return AUDIO_FORMAT_PCM_16_BIT; }
+        virtual uint32_t    latency() const { return (1000*AUDIO_HW_NUM_OUT_BUF*(bufferSize()/frameSize()))/sampleRate()+AUDIO_HW_OUT_LATENCY_MS; }
         virtual status_t    setVolume(float left, float right) { return INVALID_OPERATION; }
         virtual ssize_t     write(const void* buffer, size_t bytes);
         virtual status_t    standby();
@@ -323,13 +322,12 @@ private:
                                 int *pFormat,
                                 uint32_t *pChannels,
                                 uint32_t *pRate);
-        virtual uint32_t    sampleRate() const { ALOGE(" AudioStreamOutDirect: sampleRate\n"); return 8000; }
+        virtual uint32_t    sampleRate() const {ALOGD(" AudioStreamOutDirect: SampleRate %d\n",mSampleRate); return mSampleRate; }
         // must be 32-bit aligned - driver only seems to like 4800
-        virtual size_t      bufferSize() const { ALOGE(" AudioStreamOutDirect: bufferSize\n"); return 320; }
-        virtual uint32_t    channels() const {ALOGD(" AudioStreamOutDirect: channels\n"); return mChannels; }
-        virtual int         format() const {ALOGE(" AudioStreamOutDirect: format\n"); return AudioSystem::PCM_16_BIT; }
-        virtual uint32_t    latency() const { return 
-(1000*AUDIO_HW_NUM_OUT_BUF*(bufferSize()/frameSize()))/sampleRate()+AUDIO_HW_OUT_LATENCY_MS; }
+        virtual size_t      bufferSize() const { ALOGD(" AudioStreamOutDirect: bufferSize %d\n",mBufferSize);return mBufferSize; }
+        virtual uint32_t    channels() const {ALOGD(" AudioStreamOutDirect: channels %d\n",mChannels); return mChannels; }
+        virtual int         format() const {ALOGD(" AudioStreamOutDirect: format %d\n",mFormat);return mFormat; }
+        virtual uint32_t    latency() const { return (1000*AUDIO_HW_NUM_OUT_BUF*(bufferSize()/frameSize()))/sampleRate()+AUDIO_HW_OUT_LATENCY_MS; }
         virtual status_t    setVolume(float left, float right) { return INVALID_OPERATION; }
         virtual ssize_t     write(const void* buffer, size_t bytes);
         virtual status_t    standby();
@@ -353,6 +351,7 @@ private:
                 int         mFormat;
     };
 #endif
+
 // ----------------------------------------------------------------------------
 
 class AudioSessionOutLPA : public AudioStreamOut
@@ -416,7 +415,7 @@ public:
     virtual status_t    getBufferInfo(buf_info **buf);
     virtual status_t    isBufferAvailable(int *isAvail);
 
-    void* memBufferAlloc(int nSize, int32_t *ion_fd);
+	void* memBufferAlloc(int nSize, int32_t *ion_fd);
 
 private:
     Mutex               mLock;
@@ -615,7 +614,10 @@ private:
             uint32_t mVoipBitRate;
             msm_snd_endpoint *mSndEndpoints;
             int mNumSndEndpoints;
-
+#ifdef TARGET_HAS_QACT
+            msm_cad_endpoint *mCadEndpoints;
+            int mNumCadEndpoints;
+#endif
             int mCurSndDevice;
             int m7xsnddriverfd;
             bool        mDualMicEnabled;

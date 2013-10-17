@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- * Copyright (c) 2012, Code Aurora Forum. All rights reserved.
+ * Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "audio.primary.msm7627a"
+#define LOG_TAG "qcom_audio_policy_hal"
 //#define LOG_NDEBUG 0
 
 #include <stdint.h>
@@ -74,6 +74,10 @@ static uint32_t audio_device_conv_table[][HAL_API_REV_NUM] =
     { AudioSystem::DEVICE_OUT_AUX_DIGITAL, AUDIO_DEVICE_OUT_AUX_DIGITAL },
     { AudioSystem::DEVICE_OUT_ANLG_DOCK_HEADSET, AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET },
     { AudioSystem::DEVICE_OUT_DGTL_DOCK_HEADSET, AUDIO_DEVICE_OUT_DGTL_DOCK_HEADSET },
+#ifdef QCOM_FM_ENABLED
+    { AudioSystem::DEVICE_OUT_FM, AUDIO_DEVICE_OUT_FM },
+    { AudioSystem::DEVICE_OUT_FM_TX, AUDIO_DEVICE_OUT_FM_TX },
+#endif
     { AudioSystem::DEVICE_OUT_DEFAULT, AUDIO_DEVICE_OUT_DEFAULT },
     /* input devices */
     { AudioSystem::DEVICE_IN_COMMUNICATION, AUDIO_DEVICE_IN_COMMUNICATION },
@@ -84,6 +88,10 @@ static uint32_t audio_device_conv_table[][HAL_API_REV_NUM] =
     { AudioSystem::DEVICE_IN_AUX_DIGITAL, AUDIO_DEVICE_IN_AUX_DIGITAL },
     { AudioSystem::DEVICE_IN_VOICE_CALL, AUDIO_DEVICE_IN_VOICE_CALL },
     { AudioSystem::DEVICE_IN_BACK_MIC, AUDIO_DEVICE_IN_BACK_MIC },
+#ifdef QCOM_FM_ENABLED
+    { AudioSystem::DEVICE_IN_FM_RX, AUDIO_DEVICE_IN_FM_RX },
+    { AudioSystem::DEVICE_IN_FM_RX_A2DP, AUDIO_DEVICE_IN_FM_RX_A2DP },
+#endif
     { AudioSystem::DEVICE_IN_DEFAULT, AUDIO_DEVICE_IN_DEFAULT },
 };
 
@@ -455,6 +463,69 @@ static inline const struct qcom_audio_device * to_cladev(const struct audio_hw_d
     return reinterpret_cast<const struct qcom_audio_device *>(dev);
 }
 
+static uint32_t adev_get_supported_devices(const struct audio_hw_device *dev)
+{
+    /* XXX: The old AudioHardwareInterface interface is not smart enough to
+     * tell us this, so we'll lie and basically tell AF that we support the
+     * below input/output devices and cross our fingers. To do things properly,
+     * audio hardware interfaces that need advanced features (like this) should
+     * convert to the new HAL interface and not use this wrapper. */
+    return (/* OUT */
+            AUDIO_DEVICE_OUT_EARPIECE |
+            AUDIO_DEVICE_OUT_SPEAKER |
+            AUDIO_DEVICE_OUT_WIRED_HEADSET |
+            AUDIO_DEVICE_OUT_WIRED_HEADPHONE |
+            AUDIO_DEVICE_OUT_BLUETOOTH_SCO |
+            AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET |
+            AUDIO_DEVICE_OUT_BLUETOOTH_SCO_CARKIT |
+            AUDIO_DEVICE_OUT_BLUETOOTH_A2DP |
+            AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_HEADPHONES |
+            AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_SPEAKER |
+            AUDIO_DEVICE_OUT_AUX_DIGITAL |
+            AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET |
+            AUDIO_DEVICE_OUT_DGTL_DOCK_HEADSET |
+            AUDIO_DEVICE_OUT_USB_ACCESSORY |
+            AUDIO_DEVICE_OUT_USB_DEVICE |
+            AUDIO_DEVICE_OUT_REMOTE_SUBMIX |
+#ifdef QCOM_ANC_HEADSET_ENABLED
+            AUDIO_DEVICE_OUT_ANC_HEADSET |
+            AUDIO_DEVICE_OUT_ANC_HEADPHONE |
+#endif
+#ifdef QCOM_PROXY_DEVICE_ENABLED
+            AUDIO_DEVICE_OUT_PROXY |
+#endif
+#if defined(QCOM_FM_ENABLED)
+            AUDIO_DEVICE_OUT_FM |
+            AUDIO_DEVICE_OUT_FM_TX |
+#endif
+            AUDIO_DEVICE_OUT_DEFAULT |
+            /* IN */
+            AUDIO_DEVICE_IN_COMMUNICATION |
+            AUDIO_DEVICE_IN_AMBIENT |
+            AUDIO_DEVICE_IN_BUILTIN_MIC |
+            AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET |
+            AUDIO_DEVICE_IN_WIRED_HEADSET |
+            AUDIO_DEVICE_IN_AUX_DIGITAL |
+            AUDIO_DEVICE_IN_VOICE_CALL |
+            AUDIO_DEVICE_IN_BACK_MIC |
+            AUDIO_DEVICE_IN_REMOTE_SUBMIX |
+            AUDIO_DEVICE_IN_ANLG_DOCK_HEADSET |
+            AUDIO_DEVICE_IN_DGTL_DOCK_HEADSET |
+            AUDIO_DEVICE_IN_USB_ACCESSORY |
+            AUDIO_DEVICE_IN_USB_DEVICE |
+#ifdef QCOM_ANC_HEADSET_ENABLED
+            AUDIO_DEVICE_IN_ANC_HEADSET |
+#endif
+#ifdef QCOM_PROXY_DEVICE_ENABLED
+            AUDIO_DEVICE_IN_PROXY |
+#endif
+#if defined(QCOM_FM_ENABLED)
+            AUDIO_DEVICE_IN_FM_RX |
+            AUDIO_DEVICE_IN_FM_RX_A2DP |
+#endif
+            AUDIO_DEVICE_IN_DEFAULT);
+}
+
 static int adev_init_check(const struct audio_hw_device *dev)
 {
     const struct qcom_audio_device *qadev = to_cladev(dev);
@@ -618,7 +689,7 @@ static int adev_open_input_stream(struct audio_hw_device *dev,
     if (!in)
         return -ENOMEM;
 
-devices = convert_audio_device(devices, HAL_API_REV_2_0, HAL_API_REV_1_0);
+    devices = convert_audio_device(devices, HAL_API_REV_2_0, HAL_API_REV_1_0);
     in->qcom_in = qadev->hwif->openInputStream(devices, (int *)&config->format,
                                     &config->channel_mask,
                                     &config->sample_rate,
@@ -707,6 +778,7 @@ static int qcom_adev_open(const hw_module_t* module, const char* name,
     qadev->device.common.module = const_cast<hw_module_t*>(module);
     qadev->device.common.close = qcom_adev_close;
 
+    qadev->device.get_supported_devices = adev_get_supported_devices;
     qadev->device.init_check = adev_init_check;
     qadev->device.set_voice_volume = adev_set_voice_volume;
     qadev->device.set_master_volume = adev_set_master_volume;
@@ -753,7 +825,7 @@ struct qcom_audio_module HAL_MODULE_INFO_SYM = {
             hal_api_version: HARDWARE_HAL_API_VERSION,
             id: AUDIO_HARDWARE_MODULE_ID,
             name: "QCOM Audio HW HAL",
-            author: "Code Aurora Forum",
+            author: "The Linux Foundation",
             methods: &qcom_audio_module_methods,
             dso : NULL,
             reserved : {0},

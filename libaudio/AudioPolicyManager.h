@@ -114,8 +114,7 @@ protected:
         virtual audio_devices_t getDeviceForInputSource(int inputSource);
 
         // check that volume change is permitted, compute and send new volume to audio hardware
-        status_t checkAndSetVolume(int stream, int index, audio_io_handle_t output, audio_devices_t device, int delayMs = 0, bool force = 
-false);
+        status_t checkAndSetVolume(int stream, int index, audio_io_handle_t output, audio_devices_t device, int delayMs = 0, bool force = false);
 
 
         // when a device is connected, checks if an open output can be routed

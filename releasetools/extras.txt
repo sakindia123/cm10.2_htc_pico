@@ -3,7 +3,7 @@ app/VideoEditor.apk
 lib/libvideoeditor_jni.so
 lib/libvideoeditorplayer.so
 
-# CM Wallpapers (7MB)
+# Apps
 app/CMUpdater.apk
 app/Development.apk
 
@@ -190,3 +190,4 @@ media/audio/ringtones/Enter_the_Nexus.ogg
 media/audio/ringtones/Nairobi.ogg
 media/audio/ringtones/Nassau.ogg
 media/audio/ringtones/Safari.ogg
+

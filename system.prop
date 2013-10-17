@@ -6,52 +6,29 @@
 # Telephony
 rild.libpath=/system/lib/libhtc_ril.so
 rild.libargs=-d /dev/smd0
-rilswitch.vendorlibpath=/system/lib/libhtc_ril.so
-ril.subscription.types=NV,RUIM
-ro.baseband.arch = msm
-ro.ril.ecc.HTC-GCC=999,112,997
-ro.ril.ecc.HTC-WWE=999
-ro.ril.ecc.HTC-Dutch=112
-ro.ril.ecc.HTC-SPA=112, 911,112, 911
-ro.ril.ecc.HTC-FRA=112,911
-ro.ril.ecc.HTC-ITA=112,911
-ro.ril.ecc.HTC-EastEurope=112
-ro.ril.enable.a52.HTC-ITA=1
-ro.ril.enable.a53.HTC-ITA=1
-ro.ril.enable.a52=0
-ro.ril.enable.a53=1
 ro.ril.hsdpa.category=8
-ro.ril.hsxpa=1
 ro.ril.fast.dormancy.rule=1
-ro.ril.disable.fd.plmn.prefix=23402,23410,23411,23420,27202
-ro.ril.enable.managed.roaming=1
-ro.ril.gprsclass=10
-ro.ril.oem.nosim.ecclist=911,112,999,000,08,118,120,122,110,119,995
-ro.ril.emc.mode=2
-ro.telephony.ril.v3=signalstrength,singlepdp,skipbrokendatacall
-ro.ril.htcmaskw1.bitmask = 4294967295
-ro.ril.htcmaskw1 = 14449
-ro.ril.update.acoustic.table = 1
-ro.ril.avoid.pdp.overlap = 1
+ril.subscription.types=NV,RUIM
+ro.telephony.ril_class=HTCQualcommRIL
+ro.telephony.ril.v3=datacallapn,signalstrength
 ro.telephony.default_network = 0
-ro.ril.enable.sdr=1
-ro.ril.enable.amr.wideband=1
-ro.ril.enable.r8fd=0
-ro.ril.enable.pre_r8fd=1
-ro.ril.fd.pre_r8_tout.scr_off=2
-ro.ril.fd.pre_r8_tout.scr_on=3
-ro.ril.fd.r8_tout.scr_off=0
-ro.ril.fd.r8_tout.scr_on=0
-persist.rild.nitz_plmn=
-persist.rild.nitz_long_ons_0=
-persist.rild.nitz_long_ons_1=
-persist.rild.nitz_long_ons_2=
-persist.rild.nitz_long_ons_3=
-persist.rild.nitz_short_ons_0=
-persist.rild.nitz_short_ons_1=
-persist.rild.nitz_short_ons_2=
-persist.rild.nitz_short_ons_3=
 DEVICE_PROVISIONED=1
+
+# For PDP overlap problem
+ro.ril.avoid.pdp.overlap = 1
+
+#For NITZ power saving mode
+ro.ril.enable.nitz = 3
+
+# For the agps default value
+ro.ril.def.agps.mode = 2
+
+# For HSDPA low throughput
+ro.ril.disable.power.collapse = 1
+
+# Modify MTU from 1500 to 1472 on 3G network
+ro.ril.set.mtusize = 1472
+ro.ril.set.mtu1472 = 1
 
 # Time between scans in seconds. Keep it high to minimize battery drain.
 # This only affects the case in which there are remembered access points,
@@ -59,7 +36,7 @@ DEVICE_PROVISIONED=1
 wifi.supplicant_scan_interval=180
 wifi.interface=eth0
 wifi.softap.interface=eth0
- 
+
 # density in DPI of the LCD of this board. This is used to scale the UI
 # appropriately. If this property is not defined, the default value is 160 dpi.
 ro.sf.lcd_density = 160
@@ -88,20 +65,14 @@ dev.pm.dyn_samplingrate=1
 dev.pm.dyn_sample_period=700000
 
 # HTC Acoustic
-htc.audio.alc.enable   = 1
+htc.audio.alc.enable = 1
 htc.audio.swalt.enable = 1
 
 # Display
 debug.composition.7x25A.type=mdp
+debug.composition.type=mdp
 ro.hw_plat=7x27a
 ro.bq.gpu_to_cpu_unsupported=1
-media.stagefright.enable-player=true
-media.stagefright.enable-scan=true
-media.stagefright.enable-http=true
-media.stagefright.enable-fma2dp=true
-media.stagefright.enable-aac=true
-media.stagefright.enable-qcp=true
-media.stagefright.enable-meta=false
 ro.max.fling_velocity=4000
 com.qc.hdmi_out=false
 debug.camcorder.disablemeta=1
@@ -112,20 +83,43 @@ debug.qc.hardware=true
 debug.enabletr=false
 debug.hwui.render_dirty_regions=false
 debug.sf.hw=1
-ro.media.enc.jpeg.quality=100
-ro.staticwallpaper.pixelformat=RGB_565
 debug.hwc.dynThreshold=1.9
+debug.fb.rgb565=0
+
+# Video Acceleration
+video.accelerate.hw=1
+debug.performance.tuning=1
+
+# Low Power Audio
+lpa.decode=false
+audio.decoder_override_check=true
+use.non-omx.mp3.decoder=true
+use.non-omx.aac.decoder=true
+
+# Media
+ro.media.enc.jpeg.quality=100
+media.stagefright.enable-player=true
+media.stagefright.enable-scan=true
+media.stagefright.enable-http=true
+media.stagefright.enable-fma2dp=true
+media.stagefright.enable-aac=true
+media.stagefright.enable-qcp=true
+media.stagefright.enable-meta=false
 
 # Dalvik
 dalvik.vm.heapsize=48m
 ro.zram.default=0
-sys.mem.max_hidden_apps=10
+ro.sys.fw.bg_apps_limit=7
+sys.mem.max_hidden_apps=7
 dalvik.vm.checkjni=0
+dalvik.vm.checkjni=false
 dalvik.vm.dexopt-data-only=1
 dalvik.vm.dexopt-flags=v=a,o=v,m=y,u=y
 dalvik.vm.execution-mode=int:jit
 dalvik.vm.verify-bytecode=false
 dalvik.vm.lockprof.threshold=500
+dalvik.vm.heaptargetutilization=0.25
+dalvik.vm.debug.alloc=0
 
 # Misc
 ro.use_data_netmgrd=true
@@ -135,3 +129,8 @@ ro.config.sync=yes
 ro.phone_storage=0
 ro.kernel.android.checkjni=0
 ro.android.secure=0
+
+# Goo.im
+ro.goo.developerid=joilaroi
+ro.goo.rom=CM102pico
+ro.goo.version=6

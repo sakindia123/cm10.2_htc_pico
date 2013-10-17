@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "qcom_audio_policy_hal"
+#define LOG_TAG "audio_policy.msm7627a"
 //#define LOG_NDEBUG 0
 
 #include <stdint.h>
@@ -68,7 +68,7 @@ static int ap_set_device_connection_state(struct audio_policy *pol,
 {
     struct qcom_audio_policy *qap = to_qap(pol);
     return qap->apm->setDeviceConnectionState(
-                    device,
+                    (AudioSystem::audio_devices)device,
                     (AudioSystem::device_connection_state)state,
                     device_address);
 }
@@ -80,7 +80,7 @@ static audio_policy_dev_state_t ap_get_device_connection_state(
 {
     const struct qcom_audio_policy *qap = to_cqap(pol);
     return (audio_policy_dev_state_t)qap->apm->getDeviceConnectionState(
-                    device,
+                    (AudioSystem::audio_devices)device,
                     device_address);
 }
 
@@ -131,7 +131,6 @@ static int ap_init_check(const struct audio_policy *pol)
     const struct qcom_audio_policy *qap = to_cqap(pol);
     return qap->apm->initCheck();
 }
-
 
 static audio_io_handle_t ap_get_output(struct audio_policy *pol,
                                        audio_stream_type_t stream,
@@ -255,7 +254,7 @@ static int ap_get_stream_volume_index_for_device(const struct audio_policy *pol,
    const struct qcom_audio_policy *qap = to_cqap(pol);
    return qap->apm->getStreamVolumeIndex((AudioSystem::stream_type)stream,
                                           index,
-                                          AUDIO_DEVICE_OUT_DEFAULT);
+                                          device);
 }
 
 static audio_devices_t ap_get_devices_for_stream(const struct audio_policy *pol,
@@ -266,7 +265,7 @@ static audio_devices_t ap_get_devices_for_stream(const struct audio_policy *pol,
 }
 
 static audio_io_handle_t ap_get_output_for_effect(struct audio_policy *pol,
-                                            const struct effect_descriptor_s *desc)
+                                           const struct effect_descriptor_s *desc)
 {
     struct qcom_audio_policy *qap = to_qap(pol);
     return qap->apm->getOutputForEffect(desc);
@@ -366,7 +365,6 @@ static int create_qcom_ap(const struct audio_policy_device *device,
     qap->policy.unregister_effect = ap_unregister_effect;
     qap->policy.set_effect_enabled = ap_set_effect_enabled;
     qap->policy.is_stream_active = ap_is_stream_active;
-
     qap->policy.is_stream_active_remotely = ap_is_stream_active_remotely;
     qap->policy.is_source_active = ap_is_source_active;
     qap->policy.dump = ap_dump;

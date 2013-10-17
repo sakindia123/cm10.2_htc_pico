@@ -19,7 +19,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#define LOG_TAG "LGE PowerHAL"
+#define LOG_TAG "HTC PowerHAL"
 #include <utils/Log.h>
 
 #include <hardware/hardware.h>
@@ -230,7 +230,7 @@ struct lge_power_module HAL_MODULE_INFO_SYM = {
             version_major: 1,
             version_minor: 0,
             id: POWER_HARDWARE_MODULE_ID,
-            name: "LGE-MSM7x27a Power HAL",
+            name: "HTC-MSM7x27a Power HAL",
             author: "The CyanogenMod Project",
             methods: &power_module_methods,
         },

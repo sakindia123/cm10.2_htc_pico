@@ -17,29 +17,30 @@
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
+# Most specific first.
+$(call inherit-product, $(SRC_TARGET_DIR)/product/locales_full.mk)
+
+# Install/Uninstall google apps
+$(call inherit-product, vendor/google/gapps_armv6_tiny.mk)
+
 DEVICE_PACKAGE_OVERLAYS += device/htc/pico/overlay
 
-# Video decoding
-PRODUCT_PACKAGES += \
-    libmm-omxcore \
-    libstagefrighthw \
-    libOmxCore \
-    libI420colorconvert \
-    libdashplayer \
-    qcmediaplayer
-    
 # Graphics 
 PRODUCT_PACKAGES += \
     copybit.msm7x27a \
     gralloc.msm7x27a \
     hwcomposer.msm7x27a \
-    libtilerenderer
+    libgenlock \
+    liboverlay \
+    libtilerenderer \
+    libqdMetaData
     
 # Audio
 PRODUCT_PACKAGES += \
     audio.primary.msm7x27a \
     audio_policy.msm7x27a \
     audio.a2dp.default \
+    audio.usb.default \
     audio_policy.conf \
     libaudioutils
 
@@ -49,14 +50,30 @@ PRODUCT_PACKAGES += \
     lights.pico \
     gps.msm7x27a \
     librpc \
+    power.msm7x27a \
     com.android.future.usb.accessory \
     libnetcmdiface \
-    power.msm7x27a
+    HwaSettings
     
 # Camera
 PRODUCT_PACKAGES += \
-    camera.default \
+    camera.msm7x27a \
     libsurfaceflinger_client
+
+# Video decoding
+PRODUCT_PACKAGES += \
+    libmm-omxcore \
+    libstagefrighthw \
+    libOmxCore \
+    libdashplayer
+
+# Bluetooh
+PRODUCT_PACKAGES += \
+    brcm_patchram_plus
+
+# Build sim toolkit
+PRODUCT_PACKAGES += \
+    Stk
     
 # Hardware properties 
 PRODUCT_COPY_FILES += \
@@ -78,14 +95,14 @@ PRODUCT_COPY_FILES += \
 
 # Init
 PRODUCT_COPY_FILES += \
-    device/htc/pico/fstab.pico:root/fstab.pico \
-    device/htc/pico/files/init.pico.rc:root/init.pico.rc \
-    device/htc/pico/files/ueventd.pico.rc:root/ueventd.pico.rc \
-    device/htc/pico/files/init.pico.usb.rc:root/init.pico.usb.rc
+    $(LOCAL_PATH)/ramdisk/fstab.pico:root/fstab.pico \
+    $(LOCAL_PATH)/ramdisk/init.pico.rc:root/init.pico.rc \
+    $(LOCAL_PATH)/ramdisk/ueventd.pico.rc:root/ueventd.pico.rc \
+    $(LOCAL_PATH)/ramdisk/init.pico.usb.rc:root/init.pico.usb.rc
     
 # Camera
 PRODUCT_COPY_FILES += \
-    vendor/htc/pico/proprietary/lib/hw/camera.default.so:system/lib/hw/camera.default.so \
+    device/htc/pico/prebuilt/lib/hw/vendor-camera.default.so:system/lib/hw/vendor-camera.default.so \
     vendor/htc/pico/proprietary/lib/liboemcamera.so:system/lib/liboemcamera.so \
     vendor/htc/pico/proprietary/lib/libmmipl.so:system/lib/libmmipl.so \
     vendor/htc/pico/proprietary/lib/libmmjpeg.so:obj/lib/libmmjpeg.so \
@@ -134,17 +151,16 @@ PRODUCT_PACKAGES += \
 
 #Bluetooth conf
 PRODUCT_COPY_FILES += \
-    system/bluetooth/data/main.le.conf:system/etc/bluetooth/main.conf \
-    device/htc/pico/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf \
-    device/htc/pico/audio_policy.conf:system/etc/audio_policy.conf
+    system/bluetooth/data/main.le.conf:system/etc/bluetooth/main.conf
+
 # Wifi
 PRODUCT_COPY_FILES += \
     device/htc/pico/prebuilt/etc/firmware/fw_bcm4330_b2.bin:system/etc/firmware/fw_bcm4330_b2.bin \
     device/htc/pico/prebuilt/etc/firmware/fw_bcm4330_apsta_b2.bin:system/etc/firmware/fw_bcm4330_apsta_b2.bin \
     device/htc/pico/prebuilt/etc/firmware/fw_bcm4330_p2p_b2.bin:system/etc/firmware/fw_bcm4330_p2p_b2.bin \
-    device/htc/pico/files/etc/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf \
-    device/htc/pico/files/etc/dhcpd/dhcpcd.conf:system/etc/dhcpcd/dhcpcd.conf \
-    device/htc/pico/files/etc/wifi/hostapd.conf:system/etc/wifi/hostapd.conf 
+    device/htc/pico/prebuilt/etc/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf \
+    device/htc/pico/prebuilt/etc/dhcpd/dhcpcd.conf:system/etc/dhcpcd/dhcpcd.conf \
+    device/htc/pico/prebuilt/etc/wifi/hostapd.conf:system/etc/wifi/hostapd.conf
     
 # Audio
 PRODUCT_COPY_FILES += \
@@ -154,10 +170,12 @@ PRODUCT_COPY_FILES += \
     device/htc/pico/prebuilt/etc/AudioPara4_WB.csv:system/etc/AudioPara4_WB.csv \
     device/htc/pico/prebuilt/etc/AudioPreProcess.csv:system/etc/AudioPreProcess.csv \
     device/htc/pico/prebuilt/etc/AudioFilter_HP.csv:system/etc/AudioFilter_HP.csv \
-    vendor/htc/pico/proprietary/lib/libaudioeq.so:system/lib/libaudioeq.so \
-    vendor/htc/pico/proprietary/lib/libhtc_acoustic.so:system/lib/libhtc_acoustic.so \
-    device/htc/pico/prebuilt/lib/libaudioalsa.so:obj/lib/libaudioalsa.so \
-    device/htc/pico/prebuilt/lib/libaudioalsa.so:system/lib/libaudioalsa.so \
+    device/htc/pico/prebuilt/lib/libaudioeq.so:system/lib/libaudioeq.so \
+    device/htc/pico/prebuilt/lib/libhtc_acoustic.so:system/lib/libhtc_acoustic.so \
+    device/htc/pico/prebuilt/etc/AutoVolumeControl.txt:system/etc/AutoVolumeControl.txt
+
+#    device/htc/pico/prebuilt/lib/libaudioalsa.so:obj/lib/libaudioalsa.so \
+#    device/htc/pico/prebuilt/lib/libaudioalsa.so:system/lib/libaudioalsa.so
 
 # Sensors
 PRODUCT_COPY_FILES += \
@@ -184,7 +202,8 @@ PRODUCT_COPY_FILES += \
 # RIL
 PRODUCT_COPY_FILES += \
     vendor/htc/pico/proprietary/lib/libhtc_ril.so:system/lib/libhtc_ril.so \
-    vendor/htc/pico/proprietary/lib/libqc-opt.so:system/lib/libqc-opt.so
+    vendor/htc/pico/proprietary/lib/libqc-opt.so:system/lib/libqc-opt.so \
+    vendor/htc/pico/proprietary/bin/qmuxd:system/bin/qmuxd
 
 # Audio DSP Profiles
 PRODUCT_COPY_FILES += \
@@ -204,7 +223,36 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     device/htc/pico/prebuilt/bin/bma150_usr:system/bin/bma150_usr \
     device/htc/pico/prebuilt/bin/htc_ebdlogd:system/bin/htc_ebdlogd \
-    device/htc/pico/prebuilt/bin/logcat2:system/bin/logcat2
+    device/htc/pico/prebuilt/bin/logcat2:system/bin/logcat2 \
+    vendor/htc/pico/proprietary/bin/charging:system/bin/charging \
+    vendor/htc/pico/proprietary/bin/zchgd:system/bin/zchgd
+
+# charger images
+PRODUCT_COPY_FILES += \
+    vendor/htc/pico/proprietary/media/zchgd/batt_0.rle:system/media/zchgd/batt_0.rle \
+    vendor/htc/pico/proprietary/media/zchgd/batt_100.rle:system/media/zchgd/batt_100.rle \
+    vendor/htc/pico/proprietary/media/zchgd/batt_10.rle:system/media/zchgd/batt_10.rle \
+    vendor/htc/pico/proprietary/media/zchgd/batt_20.rle:system/media/zchgd/batt_20.rle \
+    vendor/htc/pico/proprietary/media/zchgd/batt_30.rle:system/media/zchgd/batt_30.rle \
+    vendor/htc/pico/proprietary/media/zchgd/batt_40.rle:system/media/zchgd/batt_40.rle \
+    vendor/htc/pico/proprietary/media/zchgd/batt_50.rle:system/media/zchgd/batt_50.rle \
+    vendor/htc/pico/proprietary/media/zchgd/batt_5.rle:system/media/zchgd/batt_5.rle \
+    vendor/htc/pico/proprietary/media/zchgd/batt_60.rle:system/media/zchgd/batt_60.rle \
+    vendor/htc/pico/proprietary/media/zchgd/batt_70.rle:system/media/zchgd/batt_70.rle \
+    vendor/htc/pico/proprietary/media/zchgd/batt_80.rle:system/media/zchgd/batt_80.rle \
+    vendor/htc/pico/proprietary/media/zchgd/batt_90.rle:system/media/zchgd/batt_90.rle \
+    vendor/htc/pico/proprietary/media/zchgd/batt_95.rle:system/media/zchgd/batt_95.rle \
+    vendor/htc/pico/proprietary/media/zchgd/charging_00.rle:system/media/zchgd/charging_00.rle \
+    vendor/htc/pico/proprietary/media/zchgd/charging_01.rle:system/media/zchgd/charging_01.rle \
+    vendor/htc/pico/proprietary/media/zchgd/charging_02.rle:system/media/zchgd/charging_02.rle \
+    vendor/htc/pico/proprietary/media/zchgd/charging_03.rle:system/media/zchgd/charging_03.rle \
+    vendor/htc/pico/proprietary/media/zchgd/charging_04.rle:system/media/zchgd/charging_04.rle \
+    vendor/htc/pico/proprietary/media/zchgd/charging_05.rle:system/media/zchgd/charging_05.rle \
+    vendor/htc/pico/proprietary/media/zchgd/charging_06.rle:system/media/zchgd/charging_06.rle \
+    vendor/htc/pico/proprietary/media/zchgd/charging_07.rle:system/media/zchgd/charging_07.rle \
+    vendor/htc/pico/proprietary/media/zchgd/charging_08.rle:system/media/zchgd/charging_08.rle \
+    vendor/htc/pico/proprietary/media/zchgd/charging_09.rle:system/media/zchgd/charging_09.rle \
+    vendor/htc/pico/proprietary/media/zchgd/error.rle:system/media/zchgd/error.rle
 
 # Keylayouts
 PRODUCT_COPY_FILES += \
@@ -219,6 +267,7 @@ PRODUCT_COPY_FILES += \
     device/htc/pico/prebuilt/usr/keylayout/synaptics-rmi-touchscreen.kl:system/usr/keylayout/synaptics-rmi-touchscreen.kl \
     device/htc/pico/prebuilt/usr/idc/himax-touchscreen.idc:system/usr/idc/himax-touchscreen.idc \
     device/htc/pico/prebuilt/usr/idc/synaptics-rmi-touchscreen.idc:system/usr/idc/synaptics-rmi-touchscreen.idc \
+    device/htc/pico/prebuilt/usr/idc/pico-keypad.idc:system/usr/idc/pico-keypad.idc \
     device/htc/pico/prebuilt/usr/keylayout/AVRCP.kl:system/usr/keylayout/AVRCP.kl \
     device/htc/pico/prebuilt/usr/keylayout/qwerty.kl:system/usr/keylayout/qwerty.kl
 
